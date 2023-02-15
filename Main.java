@@ -1,0 +1,130 @@
+/**
+*<h1>Ocean Acidification!</h1> 
+*The Ocean program implements an application that reads
+* from file and calculates the average and percentage
+* difference of Ocean statistics.
+* This is my own work.
+*
+* @author  Farhan Jarif
+* @version 1.0
+* @since   2021-03-09 
+*/
+//imports
+import java.util.*;
+import java.io.*;
+class Main {
+  //Array list to hold data
+  public static ArrayList < AcidityRecord > acidList = new ArrayList < AcidityRecord > ();
+  public static int acidCounter = 0; //static variable to count number of records
+
+  public static void main(String[] args) {
+	  	/// i would have liked you to be more robust in the file name, but declaring a variable
+		  // at line 19 : String fileName ="acidity.csv";
+       String fileName ="acidity.csv"; //file name
+        try { //start try
+          File myFile = new File(fileName); 
+            
+			    Scanner myFileReader = new Scanner(myFile); // file scanner 
+
+			    System.out.println("File name: " + myFile.getName()); // proof that my file exists
+          System.out.println("File size in bytes " + myFile.length()); // curious to know how big it is
+
+          if (myFileReader.hasNext() == true) { // let's confirm there is actually data in my file 
+              System.out.println("There is data to read in this file\n");
+          } else {
+              System.out.println("Error: File is empty");
+          }
+          
+          while (myFileReader.hasNextLine()) {
+				      String line = myFileReader.nextLine(); // holds data from a single line
+				      if (acidCounter==0){
+					      System.out.println(line); //ensuriung that i'm getting the right data
+			      	}
+                
+              //Splitting data into parts (separated by commas)
+              String[] currentData = line.split(","); 
+              double oceanCO2 = Double.parseDouble(currentData[1]); 
+				      double oceanPH = Double.parseDouble(currentData[2]);
+				      double atmosphereCO2 = Double.parseDouble(currentData[3]);
+
+              //new AcidityRecord object for the acidList
+              acidList.add(new AcidityRecord(currentData[0], oceanCO2, oceanPH, atmosphereCO2));
+              acidCounter++; //acidCounter increases each time
+            }
+	        //output of all the data
+          System.out.println(acidCounter + " record(s) have been read from the file.");
+          System.out.println("\n----------------------------------------------------");
+          System.out.println("Date       |  Ocean CO2  | Ocean PH | Atmosphere CO2");
+          System.out.println("----------------------------------------------------");
+          for (AcidityRecord oceanRecord: acidList){ // printing each line in the file, until acidList size is reached
+            System.out.println(oceanRecord.getDate()+"\t\t" + oceanRecord.getOceanCO2()+ "\t\t"+   oceanRecord.getOceanPH() + "\t\t\t"+ oceanRecord.getAtmosphereCO2());
+            System.out.println("----------------------------------------------------");
+          }
+
+          //------------------------Statistics--------------------------------------          
+          //OceanCO2 statistics
+		  // i would have liked to see these in their own method... 
+          double sumFirstTen=0;
+          double sumLastTen=0;
+          
+          for (int i=0; i<10; i++){
+            sumFirstTen = sumFirstTen + acidList.get(i).getOceanCO2();
+            sumLastTen = sumLastTen + acidList.get(acidCounter-1-i).getOceanCO2();
+          }
+
+          double averageCO2Start = sumFirstTen/10;
+          double averageCO2End = sumLastTen/10;
+
+          //OceanPH Statistics
+          sumFirstTen=0;
+          sumLastTen=0;
+          for (int i=0; i<10; i++){
+            sumFirstTen = sumFirstTen + acidList.get(i).getOceanPH();
+            sumLastTen = sumLastTen + acidList.get(acidCounter-1-i).getOceanPH();
+          }
+
+          double averageOceanPHStart = sumFirstTen/10;
+          double averageOceanPHEnd = sumLastTen/10;
+
+          //AtmosphereCO2 Statistics
+          sumFirstTen=0;
+          sumLastTen=0;
+          for (int i=0; i<10; i++){
+            sumFirstTen = sumFirstTen + acidList.get(i).getAtmosphereCO2();
+            sumLastTen = sumLastTen + acidList.get(acidCounter-1-i).getAtmosphereCO2();
+          }
+
+          double averageAtmosCO2Start = sumFirstTen/10;
+          double averageAtmosCO2End = sumLastTen/10;
+
+          //Statistics output
+          System.out.println("----------------------------------------------------");
+          System.out.println("\n\t\t\t\tSTATISTICS\n");
+          System.out.println("*******************************************");
+          System.out.println("           ***Ocean CO2 Stats***");
+          System.out.println("Average (First 10): "+  averageCO2Start);
+          System.out.println("Average (Last 10): " + averageCO2End);
+          
+          System.out.println("*******************************************");
+          System.out.println("           ***Ocean PH Stats***");
+          System.out.println("Average (First 10): "+  averageOceanPHStart);
+          System.out.println("Average (Last 10): " + averageOceanPHEnd);
+          
+          System.out.println("*******************************************");
+          System.out.println("       ***Atmospheric CO2 Stats****");
+          System.out.println("Average (First 10): "+  averageAtmosCO2Start);
+          System.out.println("Average (Last 10): " + averageAtmosCO2End);
+          System.out.println("*******************************************");
+
+          myFileReader.close(); // I am at the end of the file.  I don't need it anymore so close it
+          System.out.println("\n" + fileName +" is now closed.");
+        } //end try
+        catch (FileNotFoundException e) {
+			      //System.out.println("in the catch");
+            System.out.println("ERROR");
+            System.out.println("Your file: " + fileName+ " does not exist. :/\n");
+            e.printStackTrace();  
+        } // end catch
+        
+  }
+}
